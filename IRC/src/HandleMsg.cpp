@@ -34,11 +34,13 @@ void Server::handleClientMessage(int clientSocket) {
     std::string command, arguments;
 
     iss >> command;
+    command = toUpperCase(command);
     std::getline(iss, arguments);
     trim(arguments);
-    if (_clients[clientSocket].getState() == HANDSHAKE) {
-        trim(command);
-        handlePassCommand(clientSocket, command);
+    
+
+    if (_clients[clientSocket].getState() == HANDSHAKE && command == "PASS") {
+        handlePassCommand(clientSocket, arguments);
         return;
     }
     if (_clients[clientSocket].isInviteState()) {
@@ -47,8 +49,8 @@ void Server::handleClientMessage(int clientSocket) {
         return;
     }
 
+    if (_clients[clientSocket].getState() == LOGIN){
     std::map<std::string, CommandHandler> commandHandlers;
-
     commandHandlers["JOIN"] = &Server::handleJoinCommand;
     commandHandlers["INVITE"] = &Server::handleInviteCommand;
     commandHandlers["NICK"] = &Server::handleNickCommand;
@@ -58,7 +60,7 @@ void Server::handleClientMessage(int clientSocket) {
     commandHandlers["USER"] = &Server::handleUserCommand;
     commandHandlers["PART"] = &Server::handlePartCommand;
     commandHandlers["KICK"] = &Server::handleKickCommand;
-    commandHandlers["MSG"] = &Server::handlePrvMsg;
+    commandHandlers["PRIVMSG"] = &Server::handlePrvMsg;
     commandHandlers["KILL"] = &Server::handleKillCommand;
     commandHandlers["MODE"] = &Server::handleModeCommand;
     commandHandlers["TOPIC"] = &Server::handleTopicCommand;
@@ -69,8 +71,8 @@ void Server::handleClientMessage(int clientSocket) {
     if (it != commandHandlers.end()) {
         (this->*(it->second))(clientSocket, arguments);
         return;
+}
     }
-
     trim(clientBuffer);
     for (std::map<std::string, Channel>::iterator it = _channels.begin(); it != _channels.end(); ++it) {
         const std::string &channel = it->first;

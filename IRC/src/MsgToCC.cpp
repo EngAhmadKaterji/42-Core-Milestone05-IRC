@@ -1,13 +1,14 @@
 #include "Server.hpp"
 
 void Server::sendMessageToClient(int clientSocket, const std::string &message){
-    send(clientSocket, message.c_str(), message.length(), 0);
+    std::string msg = message + "\r\n";
+    send(clientSocket, msg.c_str(), msg.length(), 0);
 }
 
 void Server::sendMessageToClient(int clientSocket, int replyCode, const std::string &message) {
     std::ostringstream oss;
     oss << ":" << _serverName << " " << replyCode
-        << " " << _clients[clientSocket].getNickName() << " " << message;
+        << " " << _clients[clientSocket].getNickName() << " " << message << "\r\n";
     std::string fullMessage = oss.str();
     send(clientSocket, fullMessage.c_str(), fullMessage.length(), 0);
 }

@@ -2,6 +2,11 @@
 #include <sstream>
 #include <string>
 
+std::string toUpperCase(const std::string& input) {
+    std::string result = input;
+    std::transform(result.begin(), result.end(), result.begin(), static_cast<int(*)(int)>(std::toupper));
+    return result;
+}
 void ltrim(std::string &s) {
     size_t start = 0;
     while (start < s.size() && std::isspace(s[start])) {

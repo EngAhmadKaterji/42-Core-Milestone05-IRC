@@ -17,7 +17,7 @@ void Server::handlePassCommand(int clientSocket, const std::string &password) {
         }
     } else {
         _clients[clientSocket].setNoOfTries();
-        message = "Error 464: Password not correct! Please enter the password again.\r\nPassword: ";
+        message = "Error 464: Password not correct! Please enter the password again.\r\n";
         sendMessageToClient(clientSocket, message);
         std::cout << "Incorrect password for client " << clientSocket << "." << std::endl;
 
@@ -54,7 +54,7 @@ void Server::handleNewConnection() {
     struct pollfd clientPollFd = {clientSocket, POLLIN, 0}; 
     _pollFds.push_back(clientPollFd);
 
-    message = "Welcome! Please enter the password to log in.\nPassword: ";
+    message = "Welcome! Please enter the password to log in.\n";
     sendMessageToClient(clientSocket, message);
 
     std::cout << "New client connected from " << inet_ntoa(clientAddr.sin_addr) << " on socket " << clientSocket << "." << std::endl;
