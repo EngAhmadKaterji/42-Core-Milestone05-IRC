@@ -60,26 +60,46 @@ bool Channel::isClient(int clientSocket) const {
     return _clients.find(clientSocket) != _clients.end();
 }
 
-void Channel::addClient(int clientSocket) {
-    if (isInviteOnly() && !isOperator(clientSocket)) {
-        return;
+int Channel::addClient(int clientSocket) {
+    if (isInviteOnly()) {
+        if (_invitedClients.find(clientSocket) == _invitedClients.end()) {
+        return 1;
+    }
     }
     if (_limit > 0 && _clients.size() >= static_cast<size_t>(_limit)) {
-        return; 
+        return 2; 
     }
     _clients.insert(clientSocket);
+    if (_invitedClients.find(clientSocket) != _invitedClients.end())
+        return 3;
+    return 0;
 }
 
 void Channel::removeClient(int clientSocket) {
     _clients.erase(clientSocket);
 }
+void Channel::addInvitedClient(int invitedSocket) {
+    _invitedClients.insert(invitedSocket);
+}
+
+void Channel::removeInvitedClient(int invitedSocket) {
+    _invitedClients.erase(invitedSocket);
+}
 
 const std::set<int>& Channel::getClients() const {
     return _clients;
 }
-
+const std::set<int>& Channel::getInvitedClients() const{
+    return _invitedClients;
+}
 int Channel::clientCount() const {
     return _clients.size();
+}
+const std::set<int>& Channel::getOperators() const{
+    return _operators;
+}
+int Channel::operatorCount() const{
+    return _operators.size();
 }
 
 void Channel::setTopic(int clientSocket, const std::string &topic) {

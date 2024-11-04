@@ -36,9 +36,19 @@ void Server::handlePartCommand(int clientSocket, const std::string &arguments) {
         }
 
         sendMessageToChannel(channelName, partMessage, clientSocket);
+        if (channel.isOperator(clientSocket))
+            channel.removeOperator(clientSocket);
         channel.removeClient(clientSocket);
-        if (channel.getClients().size() == 0)
+        if (channel.getClients().size() == 0){
         _channels.erase(channel.getName());
+        std::cout << "Client " << clientSocket << " has left " << channelName << "." << std::endl;
+        return;
+        }
+        if (channel.operatorCount() == 0) {
+            int firstClientSocket = *channel.getClients().begin();
+            channel.addOperator(firstClientSocket);
+            sendMessageToClient(firstClientSocket, 328, channel.getName(), " :Granted operator privileges");
+            }
         std::cout << "Client " << clientSocket << " has left " << channelName << "." << std::endl;
     }
 }

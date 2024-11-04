@@ -3,6 +3,7 @@
 
 #include <set>
 #include <string>
+#include <iostream>
 
 class Channel {
 private:
@@ -14,6 +15,7 @@ private:
     bool _inviteOnly;              
     bool _topicRestricted;       
     int _limit;
+    std::set<int> _invitedClients;
 
 public:
     Channel();
@@ -30,11 +32,19 @@ public:
     void removeOperator(int clientSocket);
     bool isClient(int clientSocket) const;
 
-    void addClient(int clientSocket);
+    int addClient(int clientSocket);
     void removeClient(int clientSocket);
+
+    void addInvitedClient(int invitedSocket);
+    void removeInvitedClient(int invitedSocket);
+
     bool isFull() const;
     const std::set<int>& getClients() const;
     int clientCount() const;
+
+    const std::set<int>& getInvitedClients() const;
+    const std::set<int>& getOperators() const;
+    int operatorCount() const;
 
     void setTopic(int clientSocket, const std::string &topic);
     const std::string& getTopic() const;

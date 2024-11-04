@@ -51,6 +51,9 @@ if (targetSocket == -1) {
     return;
 }
 
+
+if (channelIt->second.isOperator(targetSocket))
+    channelIt->second.removeOperator(targetSocket);
 channelIt->second.removeClient(targetSocket);
 sendmsg = "You have been kicked from " + channel + ": " + reason + "\r\n";
 sendMessageToClient(targetSocket, sendmsg);
@@ -59,5 +62,11 @@ sendMessageToChannel(channel, sendmsg, clientSocket);
 
 if (channelIt->second.isEmpty()) {
     _channels.erase(channelIt);
+    return;
+}
+if (channelIt->second.operatorCount() == 0) {
+    int firstClientSocket = *channelIt->second.getClients().begin();
+    channelIt->second.addOperator(firstClientSocket);
+   sendMessageToClient(firstClientSocket, 328, channel, " :Granted operator privileges");
 }
 }

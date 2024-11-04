@@ -10,7 +10,7 @@ void Server::handleNickCommand(int clientSocket, const std::string &argument) {
     }
 
     _clients[clientSocket].setNickName(argument);
-    sendMessageToClient(clientSocket,": " + to_string (0) + to_string(0) + to_string(1) + " " + argument + ":Welcome to the IRC Network " + argument + ".\r\n"); 
+    sendMessageToClient(clientSocket,": 001 " + argument + ":Welcome to the IRC Network " + argument + ".\r\n"); 
     std::cout << "Client " << clientSocket << " set their nickname to: " 
               << _clients[clientSocket].getNickName() << std::endl;
 }

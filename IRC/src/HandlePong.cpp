@@ -2,7 +2,7 @@
 
 void Server::handlePingCommand(int clientSocket, const std::string &arguments) {
     if (arguments.empty()) {
-        sendMessageToClient(clientSocket, 409, ":No origin specified"); // 409: ERR_NOSUCHSERVICE
+        sendMessageToClient(clientSocket, 409, ":No origin specified");
         return;
     }
 

@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   HandleJoin.cpp                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/21 05:07:35 by root              #+#    #+#             */
-/*   Updated: 2024/10/21 05:08:15 by root             ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "Server.hpp"
 
@@ -41,27 +30,35 @@ void Server::handleJoinCommand(int clientSocket, const std::string &arguments) {
         if (!password.empty()) {
             _channels[channel].setPassword(password);
         } 
-    } else if (_channels[channel].isInviteOnly()) {
-        message = ":" + serverName + " 473 " + nickname + " " + channel + " :Cannot join channel (+i)\r\n";
+    } else if (_channels[channel].isInviteOnly() &&
+     _channels[channel].getInvitedClients().find(clientSocket) == _channels[channel].getInvitedClients().end()){
+        message = ":" + serverName + " 473 " + nickname + " " + channel + " :Cannot join channel (+i)";
         sendMessageToClient(clientSocket, message);
         return ;
     }else {
         if (!_channels[channel].getPassword().empty() && _channels[channel].getPassword() != password) {
-            message =  ":" + serverName + " 475 " + nickname + " " + channel + " :Cannot join channel (+k)\r\n";
+            message =  ":" + serverName + " 475 " + nickname + " " + channel + " :Cannot join channel (+k)";
             sendMessageToClient(clientSocket, message);
             return;
         }
     }
 
-    _channels[channel].addClient(clientSocket);
+        int type = _channels[channel].addClient(clientSocket);
+        if (type == 2) { 
+            message = ":" + serverName + " 471 " + nickname + " " + channel + " :Cannot join channel (+l)";
+            sendMessageToClient(clientSocket, message);
+            return;
+        } else if (type == 3){
+            _channels[channel].removeInvitedClient(clientSocket);
+        }
 
     if (_channels[channel].clientCount() == 1) {
         _channels[channel].addOperator(clientSocket);
     }
     _clients[clientSocket].setChannel(channel);
-    message = ":" + nickname + " JOIN :" + channel + "\r\n";
+    message = ":" + nickname + " JOIN :" + channel;
     sendMessageToClient(clientSocket, message);
-    message = ":" + nickname + " JOIN :" + channel + "\r\n";
+    message = ":" + nickname + " JOIN :" + channel;
     sendMessageToChannel(channel, message, clientSocket);
     std::cout << "Client " << clientSocket << " joined channel: " << channel << std::endl;
 }

@@ -1,24 +1,13 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   HandleInvite.cpp                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/21 05:07:32 by root              #+#    #+#             */
-/*   Updated: 2024/10/21 05:08:18 by root             ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "Server.hpp"
 #include <sstream>
 #include <vector>
 
 void Server::handleInviteeCommand(int inviteeSocket, const std::string &message) {
-    if (message == "y") {
+    if (message == "y" || message == "Y") {
         _clients[inviteeSocket].setAcceptInvite(true);
-    } else if (message == "n") {
+    } else if (message == "n" || message == "N") {
         _clients[inviteeSocket].setAcceptInvite(false);
+        _channels[_clients[inviteeSocket].getInvitedChannel()].removeInvitedClient(inviteeSocket);
     } else {
         _clients[inviteeSocket].setNoOfTries();
         if (_clients[inviteeSocket].getNoOfTries() < 3) {
@@ -30,16 +19,14 @@ void Server::handleInviteeCommand(int inviteeSocket, const std::string &message)
             _clients[inviteeSocket].setInvitedChannel("");
             _clients[inviteeSocket].setAcceptInvite(false);
             _clients[inviteeSocket].setInviteState(false);
+            _channels[_clients[inviteeSocket].getInvitedChannel()].removeInvitedClient(inviteeSocket);
         }
         return;
     }
 
     if (_clients[inviteeSocket].acceptInvite()) {
         std::string channelName = _clients[inviteeSocket].getInvitedChannel();
-        _channels[channelName].setInviteOnly(false);
-        _channels[channelName].addClient(inviteeSocket);
-        _channels[channelName].setInviteOnly(true);
-        sendMessageToClient(inviteeSocket, "You have joined channel " + channelName + ".\n");
+        sendMessageToClient(inviteeSocket, "You can joined channel " + channelName + ".\n");
         int inviterSocket = _clients[inviteeSocket].getInvitedBy();
         std::string sendmsg = ":" + getServerName() + " 341 " + _clients[inviterSocket].getNickName() + " " + _clients[inviteeSocket].getNickName() + " " + channelName + "\n";
         sendMessageToClient(inviterSocket, sendmsg);
@@ -52,6 +39,7 @@ void Server::handleInviteeCommand(int inviteeSocket, const std::string &message)
         sendMessageToClient(inviterSocket, _clients[inviteeSocket].getNickName() + " has declined the invitation to join " + _clients[inviteeSocket].getInvitedChannel() + ".\n");
         _clients[inviteeSocket].setInvitedChannel("");
         _clients[inviteeSocket].setInviteState(false);
+         _channels[_clients[inviteeSocket].getInvitedChannel()].removeInvitedClient(inviteeSocket);
     }
 }
 
@@ -105,7 +93,7 @@ void Server::handleInviteCommand(int clientSocket, const std::string &message) {
         sendMessageToClient(clientSocket, sendmsg);
         return;
     }
-
+    _channels[channel].addInvitedClient(inviteeSocket);
     sendMessageToClient(inviteeSocket, "You have been invited to join channel " + channel + ". Please press [y/n]: ");
     _clients[inviteeSocket].setInviteState(true);
     _clients[inviteeSocket].setInvitedChannel(channel);

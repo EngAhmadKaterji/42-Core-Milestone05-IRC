@@ -3,25 +3,26 @@
 void Server::handleTopicCommand(int clientSocket, const std::string &message) { 
     std::string channel;
     std::string topic;
+    std::string nickname = _clients[clientSocket].getNickName();
+    std::string serverName = getServerName();
 
     size_t colonPos = message.find(":");
-    if (colonPos + 1 >= message.length()) {
-        sendMessageToClient(clientSocket, 432, "Usage: TOPIC <channel> :<new topic>\n");
+    
+    if (colonPos == std::string::npos) {
+        channel = message;
+        trim(channel);
+        
+        std::map<std::string, Channel>::iterator channelIt = _channels.find(channel);
+        if (channelIt == _channels.end() || 
+            channelIt->second.getClients().find(clientSocket) == channelIt->second.getClients().end()) {
+            sendMessageToClient(clientSocket, 442, "You're not in this channel.\n");
+        } else {
+            std::string currentTopic = getChannelTopic(channel);
+            sendMessageToClient(clientSocket, 332, nickname + " " + channel + " :" + currentTopic + "\r\n");
+        }
         return;
     }
 
-    if (colonPos == 0 && message.length() > 0){
-       channel = message;
-       trim(channel);
-        std::map<std::string, Channel>::iterator channelIt = _channels.find(channel);
-            if (channelIt == _channels.end() || 
-        channelIt->second.getClients().find(clientSocket) == channelIt->second.getClients().end()) {
-        sendMessageToClient(clientSocket, 442, "You're not in this channel.\n");
-    } else {
-        sendMessageToClient(clientSocket, 332, channel, getChannelTopic(channel));
-    }
-    return;
-    }
     channel = message.substr(0, colonPos);
     topic = message.substr(colonPos + 1);
 
@@ -37,7 +38,7 @@ void Server::handleTopicCommand(int clientSocket, const std::string &message) {
     }
 
     if (channelIt->second.isTopicRestricted()) {
-        if(channelIt->second.isOperator(clientSocket)) {
+        if (channelIt->second.isOperator(clientSocket)) {
             channelIt->second.setTopic(clientSocket, topic);
             sendMessageToChannel(channel, "The topic in channel " + channel + " has been changed to: " + topic, clientSocket);
             sendMessageToClient(clientSocket, "Topic in channel " + channel + " changed to: " + topic + "\r\n");

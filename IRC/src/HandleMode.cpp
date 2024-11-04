@@ -42,7 +42,7 @@ void Server::handleChannelKeyMode(int clientSocket, const std::string &channel, 
     }
 
     std::string modeArgs;
-    if (iss >> modeArgs) {
+    iss >> modeArgs;
         if (modeArgs.empty() && flag == -1) {
             _channels[channel].setPassword("");
             sendMessageToClient(clientSocket, 324, channel, "-k :Channel password removed");
@@ -51,8 +51,7 @@ void Server::handleChannelKeyMode(int clientSocket, const std::string &channel, 
             sendMessageToClient(clientSocket, 324, channel, "+k :Channel password set");
         } else if (flag == 0) {
             sendMessageToClient(clientSocket, 472, channel, "+k or -k expected to set or remove channel password");
-        }
-    } else {
+        } else if (modeArgs.empty() && flag == 1) {
         sendMessageToClient(clientSocket, 461, channel, "MODE :Provide a password to set or leave empty to remove");
     }
 }
@@ -78,7 +77,7 @@ void Server::handleUserLimitMode(int clientSocket, const std::string &channel, s
 }
 
 void Server::handleOperatorPrivilegeMode(int clientSocket, const std::string &channel, std::istringstream &iss, int flag) {
-    if (!_channels[channel].isOperator(clientSocket) || !_clients[clientSocket].isOper()) {
+    if (!_channels[channel].isOperator(clientSocket)) {
         sendMessageToClient(clientSocket, 482, channel, "You must be an operator to add or remove another operator.");
         return;
     }
@@ -90,6 +89,11 @@ void Server::handleOperatorPrivilegeMode(int clientSocket, const std::string &ch
             if (_channels[channel].isOperator(targetSocket) && flag == -1) {
                 _channels[channel].removeOperator(targetSocket);
                 sendMessageToClient(clientSocket, 328, channel, targetNick + " :Operator privileges removed"); 
+                if (_channels[channel].operatorCount() == 0) {
+                int firstClientSocket = *_channels[channel].getClients().begin();
+                _channels[channel].addOperator(firstClientSocket);
+                 sendMessageToClient(firstClientSocket, 328, channel, " :Granted operator privileges");
+                }
             } else if (flag == 1) {
                 _channels[channel].addOperator(targetSocket);
                 sendMessageToClient(clientSocket, 328, channel, targetNick + " :Granted operator privileges");

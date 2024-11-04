@@ -1,11 +1,9 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <string>
 #include <vector>
 #include <map>
 #include <poll.h>
-#include <set>
 #include <algorithm>
 #include <cctype>
 #include "Client.hpp"
@@ -20,6 +18,8 @@
 #include <stdexcept>
 #include <sstream>
 #include <unistd.h>
+#include <string>
+#include <set>
 
 extern bool g_server;
 
