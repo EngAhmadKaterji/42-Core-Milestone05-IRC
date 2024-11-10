@@ -30,7 +30,7 @@ void Server::handleKillCommand(int clientSocket, const std::string &target) {
     for (clientIt = _clients.begin(); clientIt != _clients.end(); ++clientIt) {
         if (clientIt->second.getNickName() == target) {
             int targetSocket = clientIt->first;
-            message = ":" + getServerName() + " ERROR :Closing link (" + _clients[targetSocket].getNickName() + "@" + _clients[targetSocket].getHostname() + ") [Killed]\r\n";
+            message = ":" + getServerName() + " ERROR :Closing link (" + _clients[targetSocket].getNickName() + "@" + _clients[targetSocket].getHostName() + ") [Killed]\r\n";
             sendMessageToClient(targetSocket, message);
             removeClient(targetSocket);
             clientFound = true;

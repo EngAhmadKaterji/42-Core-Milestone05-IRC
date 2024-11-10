@@ -14,8 +14,8 @@ void Server::sendMessageToClient(int clientSocket, const std::string &message) {
 void Server::sendMessageToClient(int clientSocket, int replyCode, const std::string &message) {
     std::ostringstream oss;
     oss << ":" << _serverName << " " << replyCode
-        << " " << _clients[clientSocket].getNickName() << " " << message << "\r\n";
-    std::string fullMessage = oss.str();
+        << " " << _clients[clientSocket].getNickName() << " " << message;
+    std::string fullMessage = oss.str() + "\r\n";
     
     int bytesSent = send(clientSocket, fullMessage.c_str(), fullMessage.length(), 0);
     if (bytesSent < 0) {
@@ -28,8 +28,8 @@ void Server::sendMessageToClient(int clientSocket, int replyCode, const std::str
 void Server::sendMessageToClient(int clientSocket, int replyCode, const std::string &target, const std::string &message) {
     std::ostringstream oss;
     oss << ":" << _serverName << " " << replyCode << " " << _clients[clientSocket].getNickName()
-        << " " << target << " :" << message << "\r\n";
-    std::string fullMessage = oss.str();
+        << " " << target << " :" << message ;
+    std::string fullMessage = oss.str() + "\r\n";
     
     int bytesSent = send(clientSocket, fullMessage.c_str(), fullMessage.size(), 0);
     if (bytesSent < 0) {
@@ -39,13 +39,24 @@ void Server::sendMessageToClient(int clientSocket, int replyCode, const std::str
     }
 }
 
-void Server::sendMessageToChannel(const std::string &channel, const std::string &message, int senderSocket) {
-    std::string sendmsg = "PRIVMSG " + channel + " :" + message + "\r\n";
+void Server::sendMessageToChannel(const std::string &channel, const std::string &message, int senderSocket, int mode) {
+    std::string sendmsg;
 
-    std::set<int>::iterator it;
-    for (it = _channels[channel].getClients().begin(); it != _channels[channel].getClients().end(); ++it) {
+    if (mode == 1) {
+        sendmsg = message + "\r\n";
+    } else if (mode == 2) {
+        sendmsg = ":" + _clients[senderSocket].getNickName() + " MODE " + channel + " " + message + "\r\n";
+    } else if (mode == 0) {
+        sendmsg = ":" + _clients[senderSocket].getNickName() + "!"
+                + _clients[senderSocket].getUserName() + "@"
+                + _clients[senderSocket].getHostName() + " PRIVMSG "
+                + channel + " :" + message + "\r\n";
+    }
+
+    for (std::set<int>::iterator it = _channels[channel].getClients().begin(); it != _channels[channel].getClients().end(); ++it) {
         int clientSocket = *it;
-        if (clientSocket != senderSocket) {
+        // Include sender in mode messages
+        if (clientSocket != senderSocket || mode != 0) {
             int bytesSent = send(clientSocket, sendmsg.c_str(), sendmsg.length(), 0);
             if (bytesSent < 0) {
                 std::cerr << "Error sending message to client " << clientSocket << std::endl;
@@ -55,3 +66,4 @@ void Server::sendMessageToChannel(const std::string &channel, const std::string 
         }
     }
 }
+

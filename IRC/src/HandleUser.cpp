@@ -37,16 +37,16 @@ void Server::handleUserCommand(int clientSocket, const std::string &arguments) {
         return;
     }
 
-    _clients[clientSocket].setUsername(username);
-    _clients[clientSocket].setHostname(hostname);
+    _clients[clientSocket].setUserName(username);
+    _clients[clientSocket].setHostName(hostname);
     
     if (!realname.empty()) {
         _clients[clientSocket].setRealName(realname);
     }
 
     std::cout << "Client " << clientSocket 
-              << " set their username to: " << _clients[clientSocket].getUsername() 
-              << ", hostname to: " << _clients[clientSocket].getHostname() 
+              << " set their username to: " << _clients[clientSocket].getUserName() 
+              << ", hostname to: " << _clients[clientSocket].getHostName() 
               << ", real name to: " << _clients[clientSocket].getRealName() << std::endl;
 
     sendMessageToClient(clientSocket, 001, "Welcome " + _clients[clientSocket].getNickName() + "!" +

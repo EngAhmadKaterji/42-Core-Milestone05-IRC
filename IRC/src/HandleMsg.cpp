@@ -65,7 +65,7 @@ void Server::handleClientMessage(int clientSocket) {
             commandHandlers["TOPIC"] = &Server::handleTopicCommand;
             commandHandlers["WHO"] = &Server::handleWhoCommand;
             commandHandlers["SERVER"] = &Server::handleServerCommand;
-
+            commandHandlers["QUIT"] = &Server::handleQuitCommand;
             std::map<std::string, CommandHandler>::iterator it = commandHandlers.find(command);
             if (it != commandHandlers.end()) {
                 (this->*(it->second))(clientSocket, arguments);
@@ -77,7 +77,7 @@ void Server::handleClientMessage(int clientSocket) {
             const std::string &channel = it->first;
             const std::set<int> &clients = it->second.getClients();
             if (clients.find(clientSocket) != clients.end()) {
-                sendMessageToChannel(channel, line, clientSocket);
+                sendMessageToChannel(channel, line, clientSocket, 0);
             }
         }
 

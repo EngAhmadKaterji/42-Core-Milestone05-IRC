@@ -58,7 +58,7 @@ int Server::sendPrivateMessage(const std::string &sender, const std::string &rec
             int senderSocket = findClientSocketByNick(sender);
         if (_channels[channelName].getClients().find(senderSocket) != _channels[channelName].getClients().end()) {
             std::string fullMessage = "Private from " + sender + ": " + message;
-            sendMessageToChannel(targetReceiver, fullMessage, senderSocket);
+            sendMessageToChannel(targetReceiver, fullMessage, senderSocket,0);
             return 1;
         } else {
             std::string errorMsg = "You are not in this channel.";

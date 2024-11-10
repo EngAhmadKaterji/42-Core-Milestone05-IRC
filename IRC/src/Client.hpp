@@ -57,14 +57,14 @@ public:
     std::string getNickName() const;
     void setNickName(const std::string &nickName);
 
-    std::string getUsername() const;
-    void setUsername(const std::string &username);
+    std::string getUserName() const;
+    void setUserName(const std::string &username);
 
     std::string getRealName() const;
     void setRealName(const std::string &realname);
 
-    std::string getHostname() const;
-    void setHostname(const std::string &hostname);
+    std::string getHostName() const;
+    void setHostName(const std::string &hostname);
 
     std::string getInvitedChannel() const;
     void setInvitedChannel(const std::string &invitedChannel);

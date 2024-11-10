@@ -66,14 +66,14 @@ void Client::setAdmin(bool isAdmin) { _isAdmin = isAdmin; }
 std::string Client::getNickName() const { return _nickname; }
 void Client::setNickName(const std::string &nickName) { _nickname = nickName; }
 
-std::string Client::getUsername() const { return _username; }
-void Client::setUsername(const std::string &username) { _username = username; }
+std::string Client::getUserName() const { return _username; }
+void Client::setUserName(const std::string &username) { _username = username; }
 
 std::string Client::getRealName() const { return _realname; }
 void Client::setRealName(const std::string &realname) { _realname = realname; }
 
-std::string Client::getHostname() const { return _hostname; }
-void Client::setHostname(const std::string &hostname) { _hostname = hostname; }
+std::string Client::getHostName() const { return _hostname; }
+void Client::setHostName(const std::string &hostname) { _hostname = hostname; }
 
 State Client::getState() const { return _state; }
 void Client::setState(const State &state) { _state = state; }

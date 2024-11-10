@@ -52,7 +52,7 @@ private:
     void handleNewConnection();
     void removeClient(int clientSocket);
 
-    void sendMessageToChannel(const std::string &channel, const std::string &message, int senderSocket);
+    void sendMessageToChannel(const std::string &channel, const std::string &message, int senderSocket, int mode);
     void sendMessageToClient(int clientSocket, const std::string &message);
     void sendMessageToClient(int clientSocket, int replyCode, const std::string &message);
     void sendMessageToClient(int clientSocket, int replyCode, const std::string &target, const std::string &message);
@@ -76,7 +76,7 @@ private:
     void handleUserCommand(int clientSocket, const std::string &user);
     void handleKillCommand(int clientSocket, const std::string &target);
     void handlePingCommand(int clientSocket, const std::string &arguments);
-
+    void handleQuitCommand(int clientSocket, const std::string &quitMessage);
     void handleChannelMode(int clientSocket, const std::string &arguments);
     void handleOperatorPrivilegeMode(int clientSocket, const std::string &channel, std::istringstream &iss, int flag);
     void handleUserLimitMode(int clientSocket, const std::string &channel, std::istringstream &iss, int flag);
@@ -84,6 +84,7 @@ private:
     void handleTopicRestrictionMode(int clientSocket, const std::string &channel, int flag);
     void handleInviteOnlyMode(int clientSocket, const std::string &channel, int flag);
     int findClientSocketByNick(const std::string &nickname);
+    void sendUpdatedNamesList(const std::string &channel);
 };
 
 #endif

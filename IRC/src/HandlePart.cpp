@@ -35,7 +35,7 @@ void Server::handlePartCommand(int clientSocket, const std::string &arguments) {
             partMessage += " :" + message;
         }
 
-        sendMessageToChannel(channelName, partMessage, clientSocket);
+        sendMessageToChannel(channelName, partMessage, clientSocket, 0);
         if (channel.isOperator(clientSocket))
             channel.removeOperator(clientSocket);
         channel.removeClient(clientSocket);

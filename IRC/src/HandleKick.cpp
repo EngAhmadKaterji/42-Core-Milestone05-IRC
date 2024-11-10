@@ -4,7 +4,7 @@ void Server::handleKickCommand(int clientSocket, const std::string &message) {
     std::string sendmsg;
     std::size_t colonPos = message.find(":");
     if (colonPos == std::string::npos) {
-        sendmsg = "Invalid KICK command format. Use: KICK <channel> <user> :<reason>\n";
+        sendmsg = "Invalid KICK command format. Use: KICK <channel> <user> :<reason>\r\n";
         sendMessageToClient(clientSocket, sendmsg);
         return;
     }
@@ -15,7 +15,7 @@ void Server::handleKickCommand(int clientSocket, const std::string &message) {
     iss >> channel >> target;
 
     if (channel.empty() || target.empty()) {
-        sendmsg =  "Invalid KICK command format. Use: KICK <channel> <user> :<reason>\n";
+        sendmsg =  "Invalid KICK command format. Use: KICK <channel> <user> :<reason>\r\n";
         sendMessageToClient(clientSocket, sendmsg);
         return;
     }
@@ -58,7 +58,8 @@ channelIt->second.removeClient(targetSocket);
 sendmsg = "You have been kicked from " + channel + ": " + reason + "\r\n";
 sendMessageToClient(targetSocket, sendmsg);
 sendmsg = target + " has been kicked from the channel. Reason: " + reason + "\r\n";
-sendMessageToChannel(channel, sendmsg, clientSocket);
+sendMessageToChannel(channel, sendmsg, clientSocket, 0);
+ sendUpdatedNamesList(channel);
 
 if (channelIt->second.isEmpty()) {
     _channels.erase(channelIt);
